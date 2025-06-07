@@ -11,7 +11,10 @@ import java.util.*;
 
 public class CreateFeatureVectors2 {
 
+  // features index (x) -> field index (y)
+  //  y = 2x - 4
   private static final int[] DATE_FIELDS = {10, 24, 38, 66};
+  private static final int[] CITY_FIELDS = {22, 36, 50, 78};
   private static final String OUTPUT_PATH = "data/javaVector";
   private static final String VECTOR_FILE = "data/javaVector";
   private static final String LIBSVM_TRAIN_FILE = "data/javaVector_train.libsvm";
@@ -25,6 +28,7 @@ public class CreateFeatureVectors2 {
 
   public void run() throws IOException {
     List<Integer> dateFields = Utils.intArrayToList(DATE_FIELDS);
+    List<Integer> cityFields = Utils.intArrayToList(CITY_FIELDS);
     List<String> lines = Utils.readLines("data/pairs.csv");
     Files.deleteIfExists(Paths.get(OUTPUT_PATH));
     for (String line : lines) {
@@ -50,22 +54,48 @@ public class CreateFeatureVectors2 {
               if (targetName.equals(candidateName)) {
                 sameNames++;
               }
-//              else {
-//                differentNames--;
-//              }
+              else {
+                differentNames--;
+              }
             }
           }
           vectorValues.add(String.valueOf(sameNames > 0 ? sameNames : differentNames));
         }
-//        else if (dateFields.contains(i)) {
-//          try {
-//            int dateDifference = Math.abs(Integer.parseInt(targetField) - Integer.parseInt(candidateField));
-//            vectorValues.add(String.valueOf(dateDifference < 5 ? 5 - dateDifference : 0));
-//          }
-//          catch (NumberFormatException e) {
-//            vectorValues.add("0");
-//          }
-//        }
+        else if (cityFields.contains(i)){
+          int sameCity = 0;
+          int differentCity = 0;
+          List<String> targetCities = Arrays.asList(targetField.split(" "));
+          List<String> candidateCities = Arrays.asList(candidateField.split(" "));
+          for (String targetCity : targetCities) {
+            for (String candidateCity : candidateCities) {
+              if (targetCity.equals(candidateCity)) {
+                sameCity++;
+              }
+              else {
+                differentCity--;
+              }
+            }
+          }
+          vectorValues.add(String.valueOf(sameCity > 0 ? sameCity : differentCity));
+        }
+        else if (dateFields.contains(i)) {
+          try {
+            int dateDifference = Math.abs(Integer.parseInt(targetField) - Integer.parseInt(candidateField));
+            vectorValues.add(String.valueOf(dateDifference < 75 ? 75 - dateDifference : 0));
+          }
+          catch (NumberFormatException e) {
+            vectorValues.add("0");
+          }
+        }
+        else if (cityFields.contains(i)){
+          try {
+            int dateDifference = Math.abs(Integer.parseInt(targetField) - Integer.parseInt(candidateField));
+            vectorValues.add(String.valueOf(dateDifference < 75 ? 75 - dateDifference : 0));
+          }
+          catch (NumberFormatException e) {
+            vectorValues.add("0");
+          }
+        }
         else {
           // Basic logic - check if the values are an exact match
           if (targetField.equals(candidateField)) {

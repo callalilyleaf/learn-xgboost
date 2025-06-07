@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import mlflow
 
 mlflow.set_experiment("matching")
-# mlflow.set_tracking_uri("http://127.0.0.1:5000")
+# mlflow.set_tracking_uri("http://127.0.0.1:8000")
 
 with mlflow.start_run():
   # load the feature names
@@ -24,7 +24,7 @@ with mlflow.start_run():
 
   params = {'n_jobs': 4,
             'eta': 0.1,
-            'max_depth': 4,
+            'max_depth': 11,
             'gamma': 0,
             'subsample': 1,
             'colsample_bytree': 1,
@@ -34,8 +34,8 @@ with mlflow.start_run():
 
   results = {}
   watchlist = [(train, 'train'), (test, 'test')]
-  clf = xgb.train(params, train, num_boost_rounds, watchlist, evals_result = results, verbose_eval=100)
-  # clf = xgb.train(params, train, num_boost_rounds, watchlist, early_stopping_rounds=50, evals_result = results, verbose_eval=100)
+  # clf = xgb.train(params, train, num_boost_rounds, watchlist, evals_result = results, verbose_eval=100)
+  clf = xgb.train(params, train, num_boost_rounds, watchlist, early_stopping_rounds=100, evals_result = results, verbose_eval=100)
 
   #####################################
   # Evaluate predictions
